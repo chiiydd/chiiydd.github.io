@@ -1,6 +1,6 @@
 ---
 title: "多 Agent 协同开发实践：从 Hermes 到 Codex+Claude Code 的探索"
-date: 2026-04-30T22:00:00+08:00
+date: "2026-04-30"
 draft: false
 tags: ["AI", "Multi-Agent", "Rust", "Hermes", "Codex", "Claude Code", "TUI"]
 categories: ["技术学习"]
@@ -202,6 +202,48 @@ Hermes 不应该写代码，而应该：
 ### delegate_agent 的意外改动
 delegate_agent 会"越权"修改任务范围外的文件。每次任务完成后必须 `git diff --stat` 检查实际改动范围。
 
+### QR 登录调试：网络层的"隐形杀手"
+
+扫码登录功能改造时，API 调用返回 `error decoding response body`。排查过程：
+
+1. **添加调试日志** — 发现 API 返回 200 OK 但 `content-length: 0`
+2. **测试不同加密方式** — eapi/linuxapi/明文都返回空
+3. **检查 DNS** — 发现 Clash Verge 的 fake-ip 模式把 `music.163.com` 解析到 `198.18.0.93`（虚拟 IP）
+4. **绕过 Clash 测试** — 直连真实 IP 仍然返回空
+5. **发现正确端点** — `/api/login/qrcode/unikey` 可以正常返回！
+
+**根因：** 代码使用 `/weapi/` 前缀（需要 eapi 加密），但服务器对该端点返回空 body。改用 `/api/` 前缀 + 明文 form 参数即可。
+
+**教训：** 
+- 网络代理（Clash/V2Ray）可能干扰 API 调用
+- 不同的 API 前缀（`/weapi/` vs `/api/`）行为完全不同
+- 调试时要逐步排查：加密 → 端点 → 参数 → 网络环境
+
+## 多 Agent 调度优化（第二轮调研）
+
+### CLI 调用参数优化
+
+| 工具 | 旧参数 | 新参数 | 改进 |
+|------|--------|--------|------|
+| Claude Code | `claude -p` | `timeout 600 claude -p` | 硬超时防止挂起 |
+| Codex | `codex exec --full-auto` | `timeout 600 codex exec --full-auto --max-steps 50` | 限制步骤数 |
+
+### 关键发现
+
+1. **Claude Code 不支持 `--timeout` 参数** — 需要用 shell 的 `timeout` 命令包装
+2. **`--continue` 可以恢复中断的会话** — 长任务可以分段执行
+3. **MCP (Model Context Protocol) 是未来的方向** — 可以扩展 Agent 的工具能力
+4. **两轮模式最可靠** — 第一轮实现，第二轮修复编译错误
+
+### 推荐的调度策略
+
+```
+简单任务（1-2个函数）→ claude -p + timeout 300
+复杂任务（多文件重构）→ claude -p + timeout 600
+CLI 失败时 → delegate_task 作为后备
+Codex → 暂时不用（太不稳定，等改善）
+```
+
 ## 总结
 
 多 Agent 协同开发的核心不是"让 AI 写所有代码"，而是**建立一套有效的工作流**：
@@ -213,6 +255,8 @@ delegate_agent 会"越权"修改任务范围外的文件。每次任务完成后
 
 这套模式在 Rust 项目中特别有效，因为 `cargo check` 提供了即时的编译验证，让 agent 能快速迭代。
 
-> 最终成果：10 个 commit，4327 行 Rust 代码，0 个 todo stub，一个功能完整、可编译的网易云 TUI 播放器。
+> 最终成果：13 个 commit，5381 行 Rust 代码，52 个测试，0 个 todo stub，一个功能完整、可编译的网易云 TUI 播放器。
 >
 > 关键发现：`delegate_task` 是最稳定的多 Agent 调度方式；Rust 的 `cargo check` 为 AI 编码提供了即时反馈闭环；Hermes 的价值不在于写代码，而在于**设计接口、拆分任务、审查质量**。
+>
+> 第二轮调研发现：Claude Code 可以通过 `timeout` 命令包装来防止挂起；MCP 是未来的方向；两轮模式（实现 + 修复）最可靠。
