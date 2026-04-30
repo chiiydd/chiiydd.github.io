@@ -299,6 +299,25 @@ a:hover { color: var(--accent); }
   .site-header__inner { grid-template-columns: auto auto; }
   .site-nav { display: none; }
 }
+/* Mobile hero & article title */
+@media (max-width: 600px) {
+  .hero {
+    margin-top: 16px;
+    padding: 20px 18px;
+    border-radius: var(--r-md);
+  }
+  .hero__terminal {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .article__title {
+    font-size: 26px;
+    line-height: 1.25;
+  }
+  .article__lede {
+    font-size: 14.5px;
+  }
+}
 
 /* ─── Filter bar ──────────────────────────────────────────────────── */
 
