@@ -46,7 +46,12 @@ Phase 3 - 补位推进
   ├── delegate_agent: login.rs + settings.rs
   └── delegate_agent: player + queue (播放器核心)
 
-最终：9 个 commit，4012 行 Rust 代码，cargo check 全部通过
+Phase 4 - 集成收尾
+  ├── delegate_agent: 修复 serde rename + unused imports
+  ├── delegate_agent: app.rs 集成 API/Player/页面串联
+  └── delegate_agent: 修复 Rust 2024 borrow checker 规则
+
+最终：10 个 commit，4327 行 Rust 代码，cargo check 全部通过
 ```
 
 ## 经验总结
@@ -117,7 +122,43 @@ feat(tui): 实现 player 播放页面 (delegate_agent)
 
 这在多人/多 Agent 协作中非常有用——出了问题能快速定位是谁的代码。
 
-### 6. Hermes 的角色定位
+### 6. Rust 2024 Edition 的 Borrow Checker 新规则
+
+集成阶段遇到了一个典型问题：agent 生成的代码使用了 `ref mut` 模式匹配：
+
+```rust
+// ❌ Rust 2024 不允许
+if let Page::Login(ref mut lp) = self.page_stack.last_mut() {
+    self.do_login(lp, &phone, &password).await; // borrow checker 报错
+}
+```
+
+这在 Rust 2021 可以编译，但 Rust 2024 引入了新的隐式借用规则，禁止在隐式借用模式中使用 `ref mut`。修复方式：
+
+```rust
+// ✅ 正确写法
+if let Page::Login(lp) = self.page_stack.last_mut() {
+    // 直接内联逻辑，避免 self 的双重借用
+    if let Some(client) = &self.api_client {
+        client.login_phone(&phone, &password).await;
+    }
+}
+```
+
+**教训：** agent 对新版 Rust 的规则可能不熟悉，生成的代码可能在旧版能编译但新版不行。`cargo check` 是最好的验证工具。
+
+### 7. 集成阶段的"蝴蝶效应"
+
+app.rs 集成时发现一个连锁反应：给 App 添加 `api_client` 和 `player` 字段后，需要修改几乎所有 TUI 页面的 `PageAction` 定义。
+
+delegate_agent 的处理方式很聪明：
+1. 先修改 `pages/mod.rs` 添加新的 `PageAction` 变体
+2. 然后逐个修改每个页面的 `handle_event` 返回值
+3. 最后修改 `app.rs` 处理新的 action
+
+这体现了 agent 的"全局视野"——它不只是完成指定任务，还会主动修补相关的依赖代码。
+
+### 8. Hermes 的角色定位
 
 Hermes 不应该写代码，而应该：
 
@@ -142,8 +183,10 @@ Hermes 不应该写代码，而应该：
 | 9 个 API 方法 | delegate_agent | ~146s | ✅ |
 | login + settings 页面 | delegate_agent | ~126s | ✅ |
 | player + queue 核心 | delegate_agent | ~282s | ✅ |
+| warnings 修复 + serde rename | delegate_agent | ~106s | ✅ |
+| app.rs 集成 + borrow checker 修复 | delegate_agent | ~164s | ✅ |
 
-**总计：约 20 分钟完成 4000+ 行 Rust 代码的项目骨架。**
+**总计：约 25 分钟完成 4300+ 行 Rust 代码，10 个 commit，0 个 todo stub。**
 
 ## 踩坑记录
 
@@ -170,4 +213,6 @@ delegate_agent 会"越权"修改任务范围外的文件。每次任务完成后
 
 这套模式在 Rust 项目中特别有效，因为 `cargo check` 提供了即时的编译验证，让 agent 能快速迭代。
 
-> 最终成果：9 个 commit，4012 行 Rust 代码，一个功能完整的网易云 TUI 播放器骨架。
+> 最终成果：10 个 commit，4327 行 Rust 代码，0 个 todo stub，一个功能完整、可编译的网易云 TUI 播放器。
+>
+> 关键发现：`delegate_task` 是最稳定的多 Agent 调度方式；Rust 的 `cargo check` 为 AI 编码提供了即时反馈闭环；Hermes 的价值不在于写代码，而在于**设计接口、拆分任务、审查质量**。
