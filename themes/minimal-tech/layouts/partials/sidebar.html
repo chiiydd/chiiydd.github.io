@@ -1,0 +1,42 @@
+{{- /* partials/sidebar.html */ -}}
+{{- $posts := where .Site.RegularPages "Section" "in" (slice "learning" "work" "life") -}}
+{{- $totalWords := 0 -}}
+{{- range $posts }}{{ $totalWords = add $totalWords .WordCount }}{{ end -}}
+{{- $byCat := dict -}}
+{{- range $posts -}}
+  {{- $c := .Section -}}
+  {{- $byCat = merge $byCat (dict $c (add (index $byCat $c | default 0) 1)) -}}
+{{- end -}}
+<aside class="sidebar">
+  <div class="card">
+    <div class="card__head">
+      <span class="card__dot"></span><span class="card__title">/now</span>
+    </div>
+    <ul class="now-list">
+      <li><span class="now-list__k">reading</span><span class="now-list__v">{{ .Site.Params.now.reading }}</span></li>
+      <li><span class="now-list__k">building</span><span class="now-list__v">{{ .Site.Params.now.building }}</span></li>
+      <li><span class="now-list__k">city</span><span class="now-list__v">{{ .Site.Params.now.city }}</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card__head"><span class="card__dot"></span><span class="card__title">/stats</span></div>
+    <dl class="stats">
+      <div class="stats__row"><dt>posts</dt><dd>{{ printf "%03d" (len $posts) }}</dd></div>
+      <div class="stats__row"><dt>words</dt><dd>{{ $totalWords }}</dd></div>
+      <div class="stats__row"><dt>learning</dt><dd>{{ printf "%02d" (index $byCat "learning" | default 0) }}</dd></div>
+      <div class="stats__row"><dt>work</dt><dd>{{ printf "%02d" (index $byCat "work" | default 0) }}</dd></div>
+      <div class="stats__row"><dt>life</dt><dd>{{ printf "%02d" (index $byCat "life" | default 0) }}</dd></div>
+    </dl>
+  </div>
+
+  <div class="card">
+    <div class="card__head"><span class="card__dot"></span><span class="card__title">/elsewhere</span></div>
+    <ul class="links">
+      {{- with .Site.Params.github }}<li><span class="links__k">github</span><span class="links__v">@{{ . }}</span></li>{{ end }}
+      {{- with .Site.Params.twitter }}<li><span class="links__k">x</span><span class="links__v">@{{ . }}</span></li>{{ end }}
+      <li><span class="links__k">rss</span><span class="links__v"><a href="{{ "index.xml" | relURL }}">feed.xml</a></span></li>
+      {{- with .Site.Params.email }}<li><span class="links__k">email</span><span class="links__v">{{ . }}</span></li>{{ end }}
+    </ul>
+  </div>
+</aside>

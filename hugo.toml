@@ -1,0 +1,59 @@
+baseURL = "https://example.com/"
+languageCode = "zh-cn"
+title = "~/blog"
+theme = "minimal-tech"
+
+# Pagination
+[pagination]
+  pagerSize = 20
+
+[params]
+  signature = "chiiydd"
+  tagline = "Notes on code, work, and the in-between."
+  accentHue = 145              # 0-360, drives the single accent color
+  defaultDark = false          # initial theme; user can toggle
+  showHeatmap = true
+  email = "chende23@mails.ucas.ac.cn"
+  github = "https://github.com/chiiydd"
+  rss = "/index"
+  search = true                # enables pagefind UI + search nav link
+
+  # Sidebar /now block — edit freely
+  [params.now]
+    reading = "void"
+    building = "someeeeething."
+    city = "Nanjing, CN"
+
+
+
+# Top-level nav. Categories (learning/work/life) live under #post landing,
+# not in the header — keeps the bar minimal.
+[[menu.main]]
+  identifier = "post"
+  name = "post"
+  url = "/"
+  weight = 10
+[[menu.main]]
+  identifier = "archive"
+  name = "archive"
+  url = "/archive/"
+  weight = 20
+[[menu.main]]
+  identifier = "about"
+  name = "about"
+  url = "/about/"
+  weight = 30
+
+# Markdown / code highlighting
+[markup]
+  [markup.highlight]
+    style = "github"
+    lineNos = true
+    lineNumbersInTable = false
+    noClasses = false
+    tabWidth = 2
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4

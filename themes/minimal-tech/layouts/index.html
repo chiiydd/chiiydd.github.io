@@ -1,0 +1,35 @@
+{{- /* Homepage — hero + filterable list + sidebar */ -}}
+{{ define "main" }}
+{{ partial "hero.html" . }}
+
+{{- $posts := where .Site.RegularPages "Section" "in" (slice "learning" "work" "life") -}}
+
+<div class="main-grid">
+  <main>
+    <div class="filter-bar">
+      <div class="filter-bar__chips">
+        <a class="chip is-active" href="{{ "/" | relURL }}">
+          <span class="chip__label">all</span>
+          <span class="chip__count">{{ printf "%02d" (len $posts) }}</span>
+        </a>
+        {{- range slice "learning" "work" "life" -}}
+          {{- $c := . -}}
+          {{- $n := len (where $posts "Section" "eq" $c) -}}
+          <a class="chip" href="{{ printf "/%s/" $c | relURL }}">
+            <span class="chip__label">{{ $c }}</span>
+            <span class="chip__count">{{ printf "%02d" $n }}</span>
+          </a>
+        {{- end }}
+      </div>
+    </div>
+
+    {{ partial "post-list.html" $posts }}
+
+    {{- if .Site.Params.showHeatmap }}
+      {{ partial "heatmap.html" $posts }}
+    {{- end }}
+  </main>
+
+  {{ partial "sidebar.html" . }}
+</div>
+{{ end }}

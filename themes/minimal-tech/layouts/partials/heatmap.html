@@ -1,0 +1,39 @@
+{{- /* partials/heatmap.html — last 26 weeks of activity */ -}}
+{{- $posts := . -}}
+{{- $today := now -}}
+{{- $days := 182 -}}{{/* 26 * 7 */}}
+{{- $start := $today.AddDate 0 0 (sub 1 $days) -}}
+
+{{- $postDays := dict -}}
+{{- range $posts -}}
+  {{- $k := .Date.Format "2006-01-02" -}}
+  {{- $postDays = merge $postDays (dict $k true) -}}
+{{- end -}}
+
+<div class="heatmap">
+  <div class="heatmap__head">
+    <span class="heatmap__title">activity · last 26 weeks</span>
+    <span class="heatmap__legend">
+      <span>less</span>
+      <span class="heatmap__cell heatmap__cell--0"></span>
+      <span class="heatmap__cell heatmap__cell--1"></span>
+      <span class="heatmap__cell heatmap__cell--2"></span>
+      <span class="heatmap__cell heatmap__cell--3"></span>
+      <span>more</span>
+    </span>
+  </div>
+  <div class="heatmap__grid">
+    {{- range $row := seq 0 6 }}
+      <div class="heatmap__row">
+        {{- range $col := seq 0 25 }}
+          {{- $idx := add (mul $col 7) $row -}}
+          {{- $d := $start.AddDate 0 0 $idx -}}
+          {{- $iso := $d.Format "2006-01-02" -}}
+          {{- $level := 0 -}}
+          {{- if index $postDays $iso }}{{ $level = 3 }}{{ end -}}
+          <span class="heatmap__cell heatmap__cell--{{ $level }}" title="{{ $iso }}"></span>
+        {{- end }}
+      </div>
+    {{- end }}
+  </div>
+</div>

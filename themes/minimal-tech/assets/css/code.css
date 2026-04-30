@@ -1,0 +1,83 @@
+/* code.css — dual code theme, switched by [data-theme] on <html>.
+   Uses Hugo Chroma's `noClasses = false` token classes (.cl, .k, .s, .c, etc.)
+   Light  = inspired by github
+   Dark   = inspired by github-dark
+   You can regenerate full token sets via:
+     hugo gen chromastyles --style=github      > light.css
+     hugo gen chromastyles --style=github-dark > dark.css
+   The minimal mapping below covers the common tokens. */
+
+/* Light (default) */
+:root {
+  --chroma-bg: #f6f8fa;
+  --chroma-fg: #24292f;
+  --chroma-comment: #6e7781;
+  --chroma-keyword: #cf222e;
+  --chroma-string:  #0a3069;
+  --chroma-number:  #0550ae;
+  --chroma-name:    #8250df;
+  --chroma-type:    #953800;
+  --chroma-line:    #6e7781;
+}
+
+[data-theme="dark"] {
+  --chroma-bg: #0d1117;
+  --chroma-fg: #c9d1d9;
+  --chroma-comment: #8b949e;
+  --chroma-keyword: #ff7b72;
+  --chroma-string:  #a5d6ff;
+  --chroma-number:  #79c0ff;
+  --chroma-name:    #d2a8ff;
+  --chroma-type:    #ffa657;
+  --chroma-line:    #6e7681;
+}
+
+/* Apply to Hugo Chroma output */
+.chroma { background: var(--chroma-bg) !important; color: var(--chroma-fg); }
+.chroma .lnt, .chroma .ln { color: var(--chroma-line); }
+.chroma .c, .chroma .ch, .chroma .cm, .chroma .c1, .chroma .cs, .chroma .cp, .chroma .cpf { color: var(--chroma-comment); font-style: italic; }
+.chroma .k, .chroma .kc, .chroma .kd, .chroma .kn, .chroma .kp, .chroma .kr, .chroma .kt { color: var(--chroma-keyword); }
+.chroma .s, .chroma .sb, .chroma .sc, .chroma .dl, .chroma .sd, .chroma .s2, .chroma .se,
+.chroma .sh, .chroma .si, .chroma .sx, .chroma .sr, .chroma .s1, .chroma .ss { color: var(--chroma-string); }
+.chroma .m, .chroma .mb, .chroma .mf, .chroma .mh, .chroma .mi, .chroma .il, .chroma .mo { color: var(--chroma-number); }
+.chroma .n, .chroma .na, .chroma .nb, .chroma .nc, .chroma .nd, .chroma .nf, .chroma .nl,
+.chroma .nn, .chroma .nv, .chroma .vc, .chroma .vg, .chroma .vi { color: var(--chroma-fg); }
+.chroma .nb, .chroma .bp { color: var(--chroma-name); }
+.chroma .nt { color: var(--chroma-keyword); }
+.chroma .nx { color: var(--chroma-name); }
+.chroma .nf { color: var(--chroma-name); }
+.chroma .kt { color: var(--chroma-type); }
+.chroma .o, .chroma .ow { color: var(--chroma-keyword); }
+.chroma .gh, .chroma .gu { color: var(--chroma-name); font-weight: 600; }
+.chroma .gd { color: #b31d28; background: #ffeef0; }
+.chroma .gi { color: #22863a; background: #f0fff4; }
+
+/* Wrap Chroma output to match our card chrome */
+.highlight, .article__body pre.chroma {
+  margin: 28px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.highlight pre, .article__body pre.chroma {
+  margin: 0;
+  padding: 16px 18px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+/* The .code wrapper our JS injects sits *outside* .highlight; head bar styles
+   are already in styles.css. We just normalize the inner pre here. */
+.code .highlight, .code pre.chroma { border: none; margin: 0; border-radius: 0; }
+
+/* Inline code */
+:not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border: 1px solid var(--line);
+}

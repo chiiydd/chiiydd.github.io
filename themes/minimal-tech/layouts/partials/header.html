@@ -1,0 +1,26 @@
+{{- /* partials/header.html */ -}}
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="{{ "/" | relURL }}">
+      <span class="brand__bracket">[</span>
+      <span class="brand__name">{{ .Site.Params.signature | default "yu" }}</span>
+      <span class="brand__cursor"></span>
+      <span class="brand__bracket">]</span>
+    </a>
+
+    <nav class="site-nav">
+      {{- $current := .RelPermalink -}}
+      {{ range .Site.Menus.main }}
+        {{- $active := or (eq $current .URL) (and (ne .URL "/") (hasPrefix $current .URL)) -}}
+        <a class="site-nav__item{{ if $active }} is-active{{ end }}" href="{{ .URL | relURL }}">
+          <span class="site-nav__hash">#</span>{{ .Name }}
+        </a>
+      {{ end }}
+    </nav>
+
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="toggle theme">
+      <span class="theme-toggle__dot"></span>
+      <span class="theme-toggle__label" data-theme-label>light</span>
+    </button>
+  </div>
+</header>

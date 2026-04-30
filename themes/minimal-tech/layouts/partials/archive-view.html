@@ -1,0 +1,64 @@
+{{- /* Reusable archive view for both section list and archive.md single page. */ -}}
+{{- $posts := collections.Reverse (sort (where .Site.RegularPages "Section" "in" (slice "learning" "work" "life")) "Date") -}}
+
+<h1 class="page-title"><span class="page-title__hash">#</span> archive</h1>
+<p class="page-sub" data-archive-sub>{{ len $posts }} posts, all the way back.</p>
+
+<div class="archive__search">
+  <span class="archive__search-slash">/</span>
+  <input class="search-input" data-archive-input
+         placeholder="fuzzy search title or #tag…" autocomplete="off" spellcheck="false" />
+  <button class="archive__search-clear" data-archive-clear aria-label="clear" hidden>×</button>
+</div>
+
+<div class="archive" data-archive-list>
+  {{- $byYear := dict -}}
+  {{- $years := slice -}}
+  {{- range $posts -}}
+    {{- $y := .Date.Format "2006" -}}
+    {{- if not (in $years $y) -}}
+      {{- $years = $years | append $y -}}
+    {{- end -}}
+    {{- $existing := index $byYear $y | default (slice) -}}
+    {{- $byYear = merge $byYear (dict $y (append (slice .) $existing)) -}}
+  {{- end -}}
+
+  {{- range (collections.Reverse (sort $years)) }}
+    {{- $y := . -}}
+    {{- $items := index $byYear $y -}}
+    <section class="archive__year" data-year="{{ $y }}">
+      <div class="archive__year-head">
+        <span class="archive__year-num">{{ $y }}</span>
+        <span class="archive__year-rule"></span>
+        <span class="archive__year-count" data-year-count>{{ len $items }}</span>
+      </div>
+      <ul>
+        {{- range $items }}
+          {{- $cat := .Section -}}
+          <li data-archive-row
+              data-href="{{ .RelPermalink }}"
+              data-title="{{ .Title }}"
+              data-tags="{{ delimit .Params.tags "," }}"
+              onclick="location.href='{{ .RelPermalink }}'">
+            <span class="archive__date">{{ .Date.Format "01-02" }}</span>
+            <span class="cat cat--{{ $cat }}">{{ $cat }}</span>
+            <span class="archive__title">
+              <span data-archive-title><a href="{{ .RelPermalink }}">{{ .Title }}</a></span>
+              <span class="archive__matched-tags" data-archive-tags hidden></span>
+            </span>
+            <span class="archive__time">{{ .ReadingTime }}m</span>
+          </li>
+        {{- end }}
+      </ul>
+    </section>
+  {{- end }}
+</div>
+
+<div class="empty-state" data-archive-empty hidden>
+  <span class="empty-state__bracket">└─</span> no posts match "<span data-archive-empty-q></span>".
+</div>
+
+{{- $archiveJs := resources.Get "js/archive.js" -}}
+{{- if $archiveJs -}}
+  <script src="{{ $archiveJs.RelPermalink }}" defer></script>
+{{- end }}

@@ -1,0 +1,27 @@
+{{- /* partials/post-row.html — single row in the timeline list */ -}}
+{{- $cat := index .Params.categories 0 | default .Section -}}
+{{- $catPath := printf "~/%s" $cat -}}
+{{- $day := .Date.Format "02" -}}
+<li class="post-row" data-href="{{ .RelPermalink }}" onclick="location.href='{{ .RelPermalink }}'">
+  <div class="post-row__day"><span class="post-row__num">{{ $day }}</span></div>
+  <div class="post-row__meta">
+    <span class="cat cat--{{ $cat }}">{{ $catPath }}</span>
+    <span class="post-row__dot">·</span>
+    <span class="post-row__time">{{ .ReadingTime }} min</span>
+    {{- if .Params.hasCode }}
+      <span class="post-row__dot">·</span>
+      <span class="post-row__code">&lt;/&gt;</span>
+    {{- end }}
+  </div>
+  <h3 class="post-row__title">
+    {{- if .Params.pinned }}<span class="post-row__pin" title="pinned">★</span>{{ end -}}
+    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+  </h3>
+  <p class="post-row__excerpt">{{ with .Params.excerpt }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 140 }}{{ end }}</p>
+  {{- with .Params.tags }}
+    <div class="post-row__tags">
+      {{- range . }}<a class="tag" href="{{ "/tags/" | relURL }}{{ . | urlize }}/">#{{ . }}</a>{{ end -}}
+    </div>
+  {{- end }}
+  <span class="post-row__arrow" aria-hidden="true">→</span>
+</li>

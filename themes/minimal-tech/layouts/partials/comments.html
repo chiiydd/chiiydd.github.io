@@ -1,0 +1,52 @@
+{{- /* partials/comments.html — Giscus + Utterances support, pick by config.
+
+Config in hugo.toml:
+
+  [params.comments]
+    provider = "giscus"   # or "utterances", or omit to disable
+    repo = "you/your-repo"
+    repoId = "R_xxx"            # giscus only
+    category = "Comments"        # or "General"
+    categoryId = "DIC_xxx"       # giscus only
+    mapping = "pathname"
+    theme = "preferred_color_scheme"  # auto-tracks our data-theme
+
+Add `comments: false` in a post's front matter to opt-out per page.
+*/ -}}
+
+{{- $c := .Site.Params.comments -}}
+{{- $enabled := and $c (ne (.Params.comments | default true) false) -}}
+{{- if $enabled }}
+<section class="comments">
+  <div class="comments__head">
+    <span>discussion</span>
+    <span class="comments__rule"></span>
+  </div>
+
+  {{- if eq $c.provider "giscus" }}
+    <script src="https://giscus.app/client.js"
+      data-repo="{{ $c.repo }}"
+      data-repo-id="{{ $c.repoId }}"
+      data-category="{{ $c.category | default "General" }}"
+      data-category-id="{{ $c.categoryId }}"
+      data-mapping="{{ $c.mapping | default "pathname" }}"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="top"
+      data-theme="{{ $c.theme | default "preferred_color_scheme" }}"
+      data-lang="{{ .Site.LanguageCode | default "en" }}"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async></script>
+  {{- else if eq $c.provider "utterances" }}
+    <script src="https://utteranc.es/client.js"
+      repo="{{ $c.repo }}"
+      issue-term="{{ $c.mapping | default "pathname" }}"
+      label="{{ $c.label | default "comment" }}"
+      theme="{{ $c.theme | default "preferred-color-scheme" }}"
+      crossorigin="anonymous"
+      async></script>
+  {{- end }}
+</section>
+{{- end }}

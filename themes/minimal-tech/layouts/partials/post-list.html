@@ -1,0 +1,33 @@
+{{- /* partials/post-list.html — group by year-month, reversed */ -}}
+{{- $posts := . -}}
+{{- $groups := dict -}}
+{{- range $posts -}}
+  {{- $key := .Date.Format "2006-01" -}}
+  {{- $existing := index $groups $key | default (slice) -}}
+  {{- $groups = merge $groups (dict $key (append $existing (slice .))) -}}
+{{- end -}}
+
+{{- if eq (len $posts) 0 -}}
+  <div class="empty-state"><span class="empty-state__bracket">└─</span> no posts yet.</div>
+{{- else -}}
+<div class="post-list">
+  {{- /* 收集所有月份 key 并倒序排列 */ -}}
+  {{- $keys := slice -}}
+  {{- range $key, $items := $groups -}}
+    {{- $keys = $keys | append $key -}}
+  {{- end -}}
+  {{- range $key := sort $keys "value" "desc" }}
+    {{- $items := index $groups $key }}
+    <section class="post-group">
+      <div class="post-group__head">
+        <span class="post-group__month">{{ $key }}</span>
+        <span class="post-group__rule"></span>
+        <span class="post-group__count">{{ len $items }} post{{ if gt (len $items) 1 }}s{{ end }}</span>
+      </div>
+      <ol class="post-group__items">
+        {{- range $items }}{{ partial "post-row.html" . }}{{ end -}}
+      </ol>
+    </section>
+  {{- end }}
+</div>
+{{- end -}}

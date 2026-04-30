@@ -1,0 +1,8 @@
+{{- /* partials/footer.html */ -}}
+<footer class="footer">
+  <span class="footer__left">© {{ now.Year }} {{ .Site.Params.signature | default "yu" }} · built with care, no trackers</span>
+  <span class="footer__right">
+    <span>last build: {{ now.Format "2006-01-02" }}</span>
+    <a href="{{ "index.xml" | relURL }}" style="color:var(--accent)">● rss</a>
+  </span>
+</footer>

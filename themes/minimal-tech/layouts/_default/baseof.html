@@ -1,0 +1,62 @@
+{{- /* Base layout — header, main, footer, theme bootstrap */ -}}
+<!doctype html>
+<html lang="{{ .Site.LanguageCode | default "en" }}" data-theme="{{ if .Site.Params.defaultDark }}dark{{ else }}light{{ end }}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} · {{ .Site.Title }}{{ end }}</title>
+  <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.tagline }}{{ end }}" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  {{- $css := resources.Get "css/styles.css" -}}
+  {{- if $css -}}
+    <link rel="stylesheet" href="{{ $css.RelPermalink }}" />
+  {{- end }}
+  {{- $codeCss := resources.Get "css/code.css" -}}
+  {{- if $codeCss -}}
+    <link rel="stylesheet" href="{{ $codeCss.RelPermalink }}" />
+  {{- end }}
+  {{- if .Site.Params.search }}
+    <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+  {{- end }}
+
+  <link rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" href="{{ "index.xml" | absURL }}" />
+
+  <style>
+    :root {
+      --accent-hue: {{ .Site.Params.accentHue | default 145 }};
+    }
+  </style>
+
+  <script>
+    // Theme bootstrap: read localStorage before paint to avoid FOUC.
+    (function() {
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || saved === 'light') {
+          document.documentElement.dataset.theme = saved;
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <div class="app">
+    {{ partial "header.html" . }}
+
+    <div class="shell">
+      {{ block "main" . }}{{ end }}
+    </div>
+
+    {{ partial "footer.html" . }}
+  </div>
+
+  {{- $js := resources.Get "js/app.js" -}}
+  {{- if $js -}}
+    <script src="{{ $js.RelPermalink }}" defer></script>
+  {{- end }}
+</body>
+</html>

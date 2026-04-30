@@ -1,0 +1,16 @@
+{{- /* List page (section, taxonomy, etc.) */ -}}
+{{ define "main" }}
+<h1 class="page-title"><span class="page-title__hash">#</span> {{ .Title | lower }}</h1>
+<p class="page-sub">
+  {{- with .Description }}{{ . }}{{ else -}}
+    {{ len .Pages }} post{{ if gt (len .Pages) 1 }}s{{ end }} in {{ .Title | lower }}.
+  {{- end -}}
+</p>
+
+<div class="main-grid">
+  <main>
+    {{ partial "post-list.html" .Pages }}
+  </main>
+  {{ partial "sidebar.html" . }}
+</div>
+{{ end }}

@@ -1,0 +1,68 @@
+baseURL = "https://example.com/"
+languageCode = "zh-cn"
+title = "~/blog"
+theme = "minimal-tech"
+
+# Pagination
+[pagination]
+  pagerSize = 20
+
+[params]
+  signature = "yu"
+  tagline = "Notes on code, work, and the in-between."
+  accentHue = 145              # 0-360, drives the single accent color
+  defaultDark = false          # initial theme; user can toggle
+  showHeatmap = true
+  email = "hi@blog.dev"
+  github = "you"
+  twitter = "you"
+  rss = "/index.xml"
+  search = true                # enables pagefind UI + search nav link
+
+  # Sidebar /now block — edit freely
+  [params.now]
+    reading = "Designing Data-Intensive Applications"
+    building = "a static site generator in Rust"
+    city = "Hangzhou, CN"
+
+  # Comments — set provider = "" or remove block to disable.
+  [params.comments]
+    provider = "giscus"        # "giscus" | "utterances" | ""
+    repo = "you/your-blog"
+    repoId = "R_xxxxxx"
+    category = "Comments"
+    categoryId = "DIC_xxxxxx"
+    mapping = "pathname"
+    theme = "preferred_color_scheme"
+
+# Top-level nav. Categories (learning/work/life) live under #post landing,
+# not in the header — keeps the bar minimal.
+[[menu.main]]
+  identifier = "post"
+  name = "post"
+  url = "/"
+  weight = 10
+[[menu.main]]
+  identifier = "archive"
+  name = "archive"
+  url = "/archive/"
+  weight = 20
+[[menu.main]]
+  identifier = "about"
+  name = "about"
+  url = "/about/"
+  weight = 30
+
+# Markdown / code highlighting
+[markup]
+  [markup.highlight]
+    style = "github"
+    lineNos = true
+    lineNumbersInTable = false
+    noClasses = false
+    tabWidth = 2
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4

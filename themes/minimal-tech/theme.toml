@@ -1,0 +1,10 @@
+name = "minimal-tech"
+license = "MIT"
+description = "Minimal, terminal-tinged blog theme for learning / work / life notes."
+homepage = "https://example.com/"
+tags = ["minimal", "blog", "tech", "dark mode", "monospace"]
+features = ["blog", "syntax highlighting", "rss", "toc", "tags", "archive"]
+min_version = "0.128.0"
+
+[author]
+  name = "yu"

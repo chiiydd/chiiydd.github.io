@@ -1,0 +1,18 @@
+{{- /* partials/hero.html — terminal-style intro */ -}}
+{{- $sig := .Site.Params.signature | default "yu" -}}
+{{- $tagline := .Site.Params.tagline | default "Notes on code, work, and the in-between." -}}
+{{- $count := len (where .Site.RegularPages "Section" "in" (slice "learning" "work" "life")) -}}
+<section class="hero">
+  <div class="hero__grid" aria-hidden="true"></div>
+  <div class="hero__content">
+    <div class="hero__terminal">
+      <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd">whoami</span></div>
+      <div class="term-out">{{ $sig | lower }} — writing about things i'm learning to do</div>
+      <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd">ls posts/ | wc -l</span></div>
+      <div class="term-out">{{ $count }}</div>
+      <div class="term-line"><span class="term-prompt">$</span><span class="term-cmd">cat about.txt</span></div>
+      <div class="term-out">{{ $tagline }}</div>
+      <div class="term-line"><span class="term-prompt">$</span><span class="term-cursor"></span></div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,68 @@
+{{- /* Single article page */ -}}
+{{ define "main" }}
+{{- if and .File (eq .File.BaseFileName "archive") -}}
+  {{ partial "archive-view.html" . }}
+{{- else -}}
+{{- $cat := index .Params.categories 0 | default .Section -}}
+<article class="article">
+  <a class="article__back" href="{{ "/" | relURL }}"><span>←</span> back to posts</a>
+
+  <header class="article__head">
+    <div class="article__meta">
+      <span class="cat cat--{{ $cat }}">~/{{ $cat }}</span>
+      <span class="post-row__dot">·</span>
+      <span>{{ .Date.Format "2006-01-02" }}</span>
+      <span class="post-row__dot">·</span>
+      <span>{{ .ReadingTime }} min read</span>
+      <span class="post-row__dot">·</span>
+      <span>{{ .WordCount }} words</span>
+    </div>
+    <h1 class="article__title">{{ .Title }}</h1>
+    {{- with .Params.excerpt }}<p class="article__lede">{{ . }}</p>{{ end }}
+    {{- with .Params.tags }}
+      <div class="article__tags">
+        {{- range . }}<a class="tag" href="{{ "/tags/" | relURL }}{{ . | urlize }}/">#{{ . }}</a>{{ end -}}
+      </div>
+    {{- end }}
+  </header>
+
+  <div class="article__layout">
+    <div class="article__body" data-article-body>
+      {{ .Content }}
+
+      <div class="article__sign">
+        <div class="article__sign-rule"></div>
+        <div class="article__sign-inner">
+          <span>—</span><span>written {{ .Date.Format "2006-01-02" }}</span>
+        </div>
+      </div>
+
+      {{- $related := .Site.RegularPages.Related . | first 3 -}}
+      {{- if $related }}
+        <div class="related">
+          <div class="related__head"><span>related</span><span class="related__rule"></span></div>
+          <ul>
+            {{- range $related }}
+              <li onclick="location.href='{{ .RelPermalink }}'">
+                <span class="related__date">{{ .Date.Format "01-02" }}</span>
+                <span class="related__title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></span>
+                <span class="related__arrow">→</span>
+              </li>
+            {{- end }}
+          </ul>
+        </div>
+      {{- end }}
+
+      {{ partial "comments.html" . }}
+    </div>
+
+    {{- with .TableOfContents }}
+      <aside class="toc" data-toc>
+        <div class="toc__head">on this page</div>
+        {{ . }}
+      </aside>
+    {{- end }}
+  </div>
+</article>
+{{- end -}}
+{{ end }}
